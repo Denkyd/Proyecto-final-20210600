@@ -1,0 +1,490 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+class Usuario {
+    private String nombreUsuario;
+    private String nombre;
+    private String apellido;
+    private String telefono;
+    private String correoElectronico;
+    private String contraseña;
+
+    public Usuario(String nombreUsuario, String nombre, String apellido, String telefono, String correoElectronico, String contraseña) {
+        this.nombreUsuario = nombreUsuario;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.telefono = telefono;
+        this.correoElectronico = correoElectronico;
+        this.contraseña = contraseña;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public String getCorreoElectronico() {
+        return correoElectronico;
+    }
+
+    public String getContraseña() {
+        return contraseña;
+    }
+
+    @Override
+    public String toString() {
+        return nombreUsuario + " - " + nombre + " " + apellido + " - Teléfono: " + telefono + " - Correo: " + correoElectronico;
+    }
+}
+
+class GestionUsuarios {
+    private List<Usuario> usuariosRegistrados;
+
+    public GestionUsuarios() {
+        this.usuariosRegistrados = new ArrayList<>();
+    }
+
+    public void agregarUsuario(Usuario usuario) {
+        usuariosRegistrados.add(usuario);
+    }
+
+    public List<Usuario> obtenerUsuariosRegistrados() {
+        return usuariosRegistrados;
+    }
+
+    public void eliminarUsuario(Usuario usuario) {
+        usuariosRegistrados.remove(usuario);
+    }
+}
+
+class Producto {
+    private String nombre;
+    private String marca;
+    private String categoria;
+    private double precio;
+    private int cantidadDisponible;
+
+    public Producto(String nombre, String marca, String categoria, double precio, int cantidadDisponible) {
+        this.nombre = nombre;
+        this.marca = marca;
+        this.categoria = categoria;
+        this.precio = precio;
+        this.cantidadDisponible = cantidadDisponible;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public double getPrecio() {
+        return precio;
+    }
+
+    public int getCantidadDisponible() {
+        return cantidadDisponible;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    public void setCantidadDisponible(int cantidadDisponible) {
+        this.cantidadDisponible = cantidadDisponible;
+    }
+
+    @Override
+    public String toString() {
+        return nombre + " - " + marca + " - " + categoria + " - Precio: $" + precio + " - Cantidad disponible: " + cantidadDisponible;
+    }
+}
+
+class GestionProductos {
+    private List<Producto> productos;
+
+    public GestionProductos() {
+        this.productos = new ArrayList<>();
+    }
+
+    public void agregarProducto(Producto producto) {
+        productos.add(producto);
+    }
+
+    public List<Producto> obtenerProductos() {
+        return productos;
+    }
+
+    public void eliminarProducto(Producto producto) {
+        productos.remove(producto);
+    }
+}
+
+public class SistemaGestionAlmacen extends JFrame {
+    private GestionUsuarios gestionUsuarios;
+    private GestionProductos gestionProductos;
+    private JPanel panelPrincipal;
+    private Usuario usuarioActual;
+
+    public SistemaGestionAlmacen() {
+        setTitle("Sistema de Gestión de Almacén");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        panelPrincipal = new JPanel(new BorderLayout());
+
+        mostrarPantallaLogin();
+
+        getContentPane().add(panelPrincipal);
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        gestionUsuarios = new GestionUsuarios();
+        gestionProductos = new GestionProductos();
+    }
+
+    private void mostrarPantallaLogin() {
+        panelPrincipal.removeAll();
+
+        JPanel panelLogin = new JPanel(new GridLayout(4, 2));
+
+        JLabel labelUsuario = new JLabel("Usuario:");
+        JTextField campoUsuario = new JTextField();
+        JLabel labelContraseña = new JLabel("Contraseña:");
+        JPasswordField campoContraseña = new JPasswordField();
+        JButton botonIniciarSesion = new JButton("Iniciar Sesión");
+        JButton botonRegistrarse = new JButton("Registrarse");
+
+        panelLogin.add(labelUsuario);
+        panelLogin.add(campoUsuario);
+        panelLogin.add(labelContraseña);
+        panelLogin.add(campoContraseña);
+        panelLogin.add(botonIniciarSesion);
+        panelLogin.add(botonRegistrarse);
+
+        panelPrincipal.add(panelLogin, BorderLayout.CENTER);
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+
+        botonIniciarSesion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String usuario = campoUsuario.getText();
+                String contraseña = new String(campoContraseña.getPassword());
+
+                if (usuario.isEmpty() || contraseña.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar su usuario y contraseña.");
+                } else {
+                    // Validar usuario y contraseña
+                    // Si son válidos, mostrar pantalla principal
+                    usuarioActual = validarUsuario(usuario, contraseña);
+                    if (usuarioActual != null) {
+                        mostrarPantallaPrincipal();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos.");
+                    }
+                }
+            }
+        });
+
+        botonRegistrarse.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Mostrar pantalla de registro de usuarios
+                mostrarPantallaRegistro();
+            }
+        });
+    }
+
+    private void mostrarPantallaRegistro() {
+        panelPrincipal.removeAll();
+
+        JPanel panelRegistro = new JPanel(new GridLayout(7, 2));
+
+        JLabel labelNombreUsuario = new JLabel("Nombre de usuario:");
+        JTextField campoNombreUsuario = new JTextField();
+        JLabel labelNombre = new JLabel("Nombre:");
+        JTextField campoNombre = new JTextField();
+        JLabel labelApellido = new JLabel("Apellido:");
+        JTextField campoApellido = new JTextField();
+        JLabel labelTelefono = new JLabel("Teléfono:");
+        JTextField campoTelefono = new JTextField();
+        JLabel labelCorreo = new JLabel("Correo electrónico:");
+        JTextField campoCorreo = new JTextField();
+        JLabel labelContraseña = new JLabel("Contraseña:");
+        JPasswordField campoContraseña = new JPasswordField();
+        JLabel labelConfirmarContraseña = new JLabel("Confirmar contraseña:");
+        JPasswordField campoConfirmarContraseña = new JPasswordField();
+        JButton botonRegistrar = new JButton("Registrar");
+        JButton botonCancelar = new JButton("Cancelar");
+
+        panelRegistro.add(labelNombreUsuario);
+        panelRegistro.add(campoNombreUsuario);
+        panelRegistro.add(labelNombre);
+        panelRegistro.add(campoNombre);
+        panelRegistro.add(labelApellido);
+        panelRegistro.add(campoApellido);
+        panelRegistro.add(labelTelefono);
+        panelRegistro.add(campoTelefono);
+        panelRegistro.add(labelCorreo);
+        panelRegistro.add(campoCorreo);
+        panelRegistro.add(labelContraseña);
+        panelRegistro.add(campoContraseña);
+        panelRegistro.add(labelConfirmarContraseña);
+        panelRegistro.add(campoConfirmarContraseña);
+        panelRegistro.add(botonRegistrar);
+        panelRegistro.add(botonCancelar);
+
+        panelPrincipal.add(panelRegistro, BorderLayout.CENTER);
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+
+        botonRegistrar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String nombreUsuario = campoNombreUsuario.getText();
+                String nombre = campoNombre.getText();
+                String apellido = campoApellido.getText();
+                String telefono = campoTelefono.getText();
+                String correo = campoCorreo.getText();
+                String contraseña = new String(campoContraseña.getPassword());
+                String confirmarContraseña = new String(campoConfirmarContraseña.getPassword());
+
+                if (nombreUsuario.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || telefono.isEmpty() || correo.isEmpty() || contraseña.isEmpty() || confirmarContraseña.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios.");
+                } else if (!contraseña.equals(confirmarContraseña)) {
+                    JOptionPane.showMessageDialog(null, "La contraseña y la confirmación no coinciden.");
+                } else {
+                    // Crear nuevo usuario y agregarlo a la lista de usuarios
+                    Usuario nuevoUsuario = new Usuario(nombreUsuario, nombre, apellido, telefono, correo, contraseña);
+                    gestionUsuarios.agregarUsuario(nuevoUsuario);
+                    JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.");
+                    mostrarPantallaLogin();
+                }
+            }
+        });
+
+        botonCancelar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarPantallaLogin();
+            }
+        });
+    }
+
+    private void mostrarPantallaPrincipal() {
+        panelPrincipal.removeAll();
+
+        JPanel panelPrincipalUsuario = new JPanel(new BorderLayout());
+
+        JTextArea areaInfoUsuario = new JTextArea();
+        areaInfoUsuario.append("Información del usuario:\n");
+        areaInfoUsuario.append("Nombre de usuario: " + usuarioActual.getNombreUsuario() + "\n");
+        areaInfoUsuario.append("Nombre: " + usuarioActual.getNombre() + "\n");
+        areaInfoUsuario.append("Apellido: " + usuarioActual.getApellido() + "\n");
+        areaInfoUsuario.append("Teléfono: " + usuarioActual.getTelefono() + "\n");
+        areaInfoUsuario.append("Correo electrónico: " + usuarioActual.getCorreoElectronico() + "\n");
+
+        panelPrincipalUsuario.add(areaInfoUsuario, BorderLayout.NORTH);
+
+        JButton botonGestionUsuarios = new JButton("Gestión de Usuarios");
+        JButton botonGestionProductos = new JButton("Gestión de Productos");
+
+        panelPrincipalUsuario.add(botonGestionUsuarios, BorderLayout.WEST);
+        panelPrincipalUsuario.add(botonGestionProductos, BorderLayout.EAST);
+
+        panelPrincipal.add(panelPrincipalUsuario, BorderLayout.CENTER);
+
+        botonGestionUsuarios.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarVentanaUsuarios();
+            }
+        });
+
+        botonGestionProductos.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarVentanaProductos();
+            }
+        });
+
+        JButton botonCerrarSesion = new JButton("Cerrar Sesión");
+        panelPrincipal.add(botonCerrarSesion, BorderLayout.SOUTH);
+
+        botonCerrarSesion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                usuarioActual = null;
+                mostrarPantallaLogin();
+            }
+        });
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+
+    private void mostrarVentanaUsuarios() {
+        panelPrincipal.removeAll();
+
+        JPanel panelUsuarios = new JPanel(new BorderLayout());
+
+        JTextArea areaListaUsuarios = new JTextArea();
+        areaListaUsuarios.setEditable(false);
+        areaListaUsuarios.append("Listado de Usuarios Registrados:\n");
+        List<Usuario> usuariosRegistrados = gestionUsuarios.obtenerUsuariosRegistrados();
+        for (Usuario usuario : usuariosRegistrados) {
+            areaListaUsuarios.append(usuario.toString() + "\n");
+        }
+
+        panelUsuarios.add(new JScrollPane(areaListaUsuarios), BorderLayout.CENTER);
+
+        JButton botonVolver = new JButton("Volver");
+        panelUsuarios.add(botonVolver, BorderLayout.SOUTH);
+
+        panelPrincipal.add(panelUsuarios, BorderLayout.CENTER);
+
+        botonVolver.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarPantallaPrincipal();
+            }
+        });
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+
+    private void mostrarVentanaProductos() {
+        panelPrincipal.removeAll();
+
+        JPanel panelProductos = new JPanel(new BorderLayout());
+
+        JTextArea areaListaProductos = new JTextArea();
+        areaListaProductos.setEditable(false);
+        areaListaProductos.append("Listado de Productos:\n");
+        List<Producto> productos = gestionProductos.obtenerProductos();
+        for (Producto producto : productos) {
+            areaListaProductos.append(producto.toString() + "\n");
+        }
+
+        panelProductos.add(new JScrollPane(areaListaProductos), BorderLayout.CENTER);
+
+        JButton botonNuevoProducto = new JButton("Nuevo Producto");
+        panelProductos.add(botonNuevoProducto, BorderLayout.NORTH);
+
+        JButton botonVolver = new JButton("Volver");
+        panelProductos.add(botonVolver, BorderLayout.SOUTH);
+
+        panelPrincipal.add(panelProductos, BorderLayout.CENTER);
+
+        botonNuevoProducto.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarFormularioNuevoProducto();
+            }
+        });
+
+        botonVolver.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarPantallaPrincipal();
+            }
+        });
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+
+    private void mostrarFormularioNuevoProducto() {
+        panelPrincipal.removeAll();
+
+        JPanel panelNuevoProducto = new JPanel(new GridLayout(6, 2));
+
+        JLabel labelNombre = new JLabel("Nombre:");
+        JTextField campoNombre = new JTextField();
+        JLabel labelMarca = new JLabel("Marca:");
+        JTextField campoMarca = new JTextField();
+        JLabel labelCategoria = new JLabel("Categoría:");
+        JTextField campoCategoria = new JTextField();
+        JLabel labelPrecio = new JLabel("Precio:");
+        JTextField campoPrecio = new JTextField();
+        JLabel labelCantidad = new JLabel("Cantidad Disponible:");
+        JTextField campoCantidad = new JTextField();
+        JButton botonGuardar = new JButton("Guardar");
+        JButton botonCancelar = new JButton("Cancelar");
+
+        panelNuevoProducto.add(labelNombre);
+        panelNuevoProducto.add(campoNombre);
+        panelNuevoProducto.add(labelMarca);
+        panelNuevoProducto.add(campoMarca);
+        panelNuevoProducto.add(labelCategoria);
+        panelNuevoProducto.add(campoCategoria);
+        panelNuevoProducto.add(labelPrecio);
+        panelNuevoProducto.add(campoPrecio);
+        panelNuevoProducto.add(labelCantidad);
+        panelNuevoProducto.add(campoCantidad);
+        panelNuevoProducto.add(botonGuardar);
+        panelNuevoProducto.add(botonCancelar);
+
+        panelPrincipal.add(panelNuevoProducto, BorderLayout.CENTER);
+
+        botonGuardar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Obtener datos del formulario
+                String nombre = campoNombre.getText();
+                String marca = campoMarca.getText();
+                String categoria = campoCategoria.getText();
+                double precio = Double.parseDouble(campoPrecio.getText());
+                int cantidad = Integer.parseInt(campoCantidad.getText());
+
+                // Crear nuevo producto y agregarlo a la lista de productos
+                Producto nuevoProducto = new Producto(nombre, marca, categoria, precio, cantidad);
+                gestionProductos.agregarProducto(nuevoProducto);
+                JOptionPane.showMessageDialog(null, "Producto registrado correctamente.");
+                mostrarVentanaProductos();
+            }
+        });
+
+        botonCancelar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarVentanaProductos();
+            }
+        });
+
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+
+    private Usuario validarUsuario(String nombreUsuario, String contraseña) {
+        List<Usuario> usuariosRegistrados = gestionUsuarios.obtenerUsuariosRegistrados();
+        for (Usuario usuario : usuariosRegistrados) {
+            if (usuario.getNombreUsuario().equals(nombreUsuario) && usuario.getContraseña().equals(contraseña)) {
+                return usuario;
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new SistemaGestionAlmacen();
+            }
+        });
+    }
+}
